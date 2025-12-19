@@ -644,13 +644,16 @@ elif page == "Modeling":
 elif page == "Evaluasi":
     st.header("📈 Evaluasi Model")
 
-    # Cek apakah model sudah ada (file)
+    # Cek apakah model sudah ada
     if not os.path.exists(MODEL_PATH):
         st.warning("⚠️ Belum ada model. Lakukan training di halaman Modeling.")
         st.stop()
-    
-    # Cek apakah data evaluasi tersedia di session_state
-    if "last_y_test" in st.session_state and "last_y_pred" in st.session_state and "last_accuracy" in st.session_state:
+
+    # Cek apakah evaluasi terakhir tersedia
+    if ("last_y_test" in st.session_state 
+        and "last_y_pred" in st.session_state 
+        and "last_accuracy" in st.session_state):
+
         y_test = st.session_state.last_y_test
         y_pred = st.session_state.last_y_pred
         accuracy = st.session_state.last_accuracy
@@ -677,10 +680,9 @@ elif page == "Evaluasi":
         st.pyplot(fig)
 
     else:
-        # Kalau belum ada training
+        # Kalau belum ada training, jangan akses confusion_matrix sama sekali
         st.info("📌 Lakukan training model terlebih dahulu untuk melihat metrik evaluasi terbaru.")
 
-    
     
 
 # ===== PREDIKSI =====
@@ -809,5 +811,6 @@ elif page == "Prediksi":
         st.dataframe(
             importance_df.style.format({"Importance": "{:.4f}"})
         )
+
 
 
