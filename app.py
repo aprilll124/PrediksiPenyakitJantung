@@ -644,40 +644,42 @@ elif page == "Modeling":
 elif page == "Evaluasi":
     st.header("📈 Evaluasi Model")
 
+    # Cek apakah model sudah ada (file)
     if not os.path.exists(MODEL_PATH):
         st.warning("⚠️ Belum ada model. Lakukan training di halaman Modeling.")
         st.stop()
     
-    # Cek dulu apakah y_test dan y_pred ada
-    if "last_y_test" in st.session_state and "last_y_pred" in st.session_state:
+    # Cek apakah data evaluasi tersedia di session_state
+    if "last_y_test" in st.session_state and "last_y_pred" in st.session_state and "last_accuracy" in st.session_state:
         y_test = st.session_state.last_y_test
         y_pred = st.session_state.last_y_pred
         accuracy = st.session_state.last_accuracy
-    
-        st.success(f"🎯 **Akurasi Terakhir:** {accuracy:.4f} ({accuracy*100:.2f}%)")
-    
+
+        st.success(f"🎯 Akurasi Terakhir: {accuracy:.4f} ({accuracy*100:.2f}%)")
+        
+        # Classification Report
         st.subheader("📊 Classification Report")
         report = classification_report(y_test, y_pred, output_dict=True)
         report_df = pd.DataFrame(report).transpose()
         st.dataframe(report_df.style.format("{:.4f}"))
-    
+
+        # Confusion Matrix
         st.subheader("🧩 Confusion Matrix")
         cm = confusion_matrix(y_test, y_pred)
         fig, ax = plt.subplots()
-        im = ax.imshow(cm)
-    
+        im = ax.imshow(cm, cmap="Blues")
         ax.set_xlabel("Predicted Label")
         ax.set_ylabel("True Label")
         ax.set_title("Confusion Matrix")
-    
         for i in range(cm.shape[0]):
             for j in range(cm.shape[1]):
-                ax.text(j, i, cm[i, j], ha="center", va="center")
-    
+                ax.text(j, i, cm[i, j], ha="center", va="center", color="red")
         st.pyplot(fig)
-    
+
     else:
-        st.info("📌 Lakukan training untuk melihat metrik evaluasi terbaru.")
+        # Kalau belum ada training
+        st.info("📌 Lakukan training model terlebih dahulu untuk melihat metrik evaluasi terbaru.")
+
     
     
 
@@ -807,4 +809,5 @@ elif page == "Prediksi":
         st.dataframe(
             importance_df.style.format({"Importance": "{:.4f}"})
         )
+
 
