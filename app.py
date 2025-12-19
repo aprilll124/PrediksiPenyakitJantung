@@ -462,52 +462,6 @@ elif page == "Preparation":
             st.session_state.df = df_fs[selected_columns]
             st.success(f"✅ {len(selected_columns)} kolom berhasil dipilih")
             st.rerun()
-    
-    # ===== ENCODING DATA KATEGORIKAL =====
-    st.divider()
-    st.subheader("5️⃣ Encoding Data Kategorikal")
-
-    df_enc = st.session_state.df.copy()
-
-    binary_cols = ['sex', 'fasting blood sugar', 'exercise angina']
-
-    categorical_cols = ['chest pain type', 'resting ecg', 'ST slope']
-
-    if categorical_cols:
-        st.write(f"Kolom kategori (lebih dari 2 kelas) yang akan di-one-hot encode: {', '.join(categorical_cols)}")
-
-        if st.button("🔄 Terapkan Encoding Otomatis", use_container_width=True):
-            df_enc = pd.get_dummies(df_enc, columns=categorical_cols, drop_first=True)
-            st.session_state.df = df_enc
-            st.success("✅ Encoding berhasil diterapkan")
-            st.rerun()
-    else:
-        st.success("✅ Tidak ada kolom kategorikal untuk di-encode, kolom biner tetap 0/1")
-
-
-    # FEATURE SCALING (STANDARDIZATION)
-    st.divider()
-    st.subheader("6️⃣ Feature Scaling (Standardization)")
-
-    df_scaled = st.session_state.df.copy()
-
-    target_col = "target"
-    if target_col in df_scaled.columns:
-        feature_cols = df_scaled.drop(columns=[target_col]).select_dtypes(include=["int64", "float64"]).columns.tolist()
-    else:
-        feature_cols = df_scaled.select_dtypes(include=["int64", "float64"]).columns.tolist()
-
-    if feature_cols:
-        if st.button("📐 Terapkan StandardScaler", use_container_width=True):
-            scaler = StandardScaler()
-            df_scaled[feature_cols] = scaler.fit_transform(df_scaled[feature_cols])
-
-            st.session_state.df = df_scaled
-            st.session_state.scaler = scaler
-            st.success("✅ Feature scaling berhasil diterapkan")
-            st.rerun()
-    else:
-        st.warning("⚠️ Tidak ada fitur numerik untuk distandarisasi")
 
     # Standarisasi nama kolom sebelum download & modeling
     rename_dict = {
@@ -810,6 +764,7 @@ elif page == "Prediksi":
         st.dataframe(
             importance_df.style.format({"Importance": "{:.4f}"})
         )
+
 
 
 
