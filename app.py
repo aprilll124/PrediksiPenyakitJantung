@@ -644,7 +644,6 @@ elif page == "Modeling":
 elif page == "Evaluasi":
     st.header("📈 Evaluasi Model")
 
-    # Cek apakah model sudah ada
     if not os.path.exists(MODEL_PATH):
         st.warning("⚠️ Belum ada model. Lakukan training di halaman Modeling.")
         st.stop()
@@ -668,22 +667,22 @@ elif page == "Evaluasi":
 
         # Confusion Matrix
         st.subheader("🧩 Confusion Matrix")
-        cm = confusion_matrix(y_test, y_pred)
-        fig, ax = plt.subplots()
-        im = ax.imshow(cm, cmap="Blues")
-        ax.set_xlabel("Predicted Label")
-        ax.set_ylabel("True Label")
-        ax.set_title("Confusion Matrix")
-        for i in range(cm.shape[0]):
-            for j in range(cm.shape[1]):
-                ax.text(j, i, cm[i, j], ha="center", va="center", color="red")
-        st.pyplot(fig)
+        cm_matrix = confusion_matrix(y_test, y_pred)
+
+        # Buat figure baru agar tidak bentrok
+        import matplotlib.pyplot as mpl
+        fig_cm, ax_cm = mpl.subplots()
+        ax_cm.imshow(cm_matrix, cmap="Blues")
+        ax_cm.set_xlabel("Predicted Label")
+        ax_cm.set_ylabel("True Label")
+        ax_cm.set_title("Confusion Matrix")
+        for i in range(cm_matrix.shape[0]):
+            for j in range(cm_matrix.shape[1]):
+                ax_cm.text(j, i, cm_matrix[i, j], ha="center", va="center", color="red")
+        st.pyplot(fig_cm)
 
     else:
-        # Kalau belum ada training, jangan akses confusion_matrix sama sekali
         st.info("📌 Lakukan training model terlebih dahulu untuk melihat metrik evaluasi terbaru.")
-
-    
 
 # ===== PREDIKSI =====
 elif page == "Prediksi":
@@ -811,6 +810,7 @@ elif page == "Prediksi":
         st.dataframe(
             importance_df.style.format({"Importance": "{:.4f}"})
         )
+
 
 
 
