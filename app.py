@@ -643,50 +643,43 @@ elif page == "Modeling":
 
 elif page == "Evaluasi":
     st.header("📈 Evaluasi Model")
-    
+
     if not os.path.exists(MODEL_PATH):
         st.warning("⚠️ Belum ada model. Lakukan training di halaman Modeling.")
         st.stop()
     
-    if "last_accuracy" in st.session_state:
-        st.success(f"🎯 **Akurasi Terakhir:** {st.session_state.last_accuracy:.4f} ({st.session_state.last_accuracy*100:.2f}%)")
-        
+    # Cek dulu apakah y_test dan y_pred ada
+    if "last_y_test" in st.session_state and "last_y_pred" in st.session_state:
+        y_test = st.session_state.last_y_test
+        y_pred = st.session_state.last_y_pred
+        accuracy = st.session_state.last_accuracy
+    
+        st.success(f"🎯 **Akurasi Terakhir:** {accuracy:.4f} ({accuracy*100:.2f}%)")
+    
         st.subheader("📊 Classification Report")
-        report = classification_report(st.session_state.last_y_test, st.session_state.last_y_pred, output_dict=True)
+        report = classification_report(y_test, y_pred, output_dict=True)
         report_df = pd.DataFrame(report).transpose()
         st.dataframe(report_df.style.format("{:.4f}"))
+    
+        st.subheader("🧩 Confusion Matrix")
+        cm = confusion_matrix(y_test, y_pred)
+        fig, ax = plt.subplots()
+        im = ax.imshow(cm)
+    
+        ax.set_xlabel("Predicted Label")
+        ax.set_ylabel("True Label")
+        ax.set_title("Confusion Matrix")
+    
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                ax.text(j, i, cm[i, j], ha="center", va="center")
+    
+        st.pyplot(fig)
+    
     else:
         st.info("📌 Lakukan training untuk melihat metrik evaluasi terbaru.")
     
-    st.write("""
-    **Penjelasan Metrik:**
-    - Accuracy: Proporsi prediksi benar
-    - Precision: Akurasi prediksi positif
-    - Recall: Kemampuan mendeteksi kasus positif
-    - F1-Score: Harmonik mean precision & recall
-    """)
-
-    st.subheader("🧩 Confusion Matrix")
-
-    cm = confusion_matrix(
-        st.session_state.last_y_test,
-        st.session_state.last_y_pred
-    )
-
-    fig, ax = plt.subplots()
-    im = ax.imshow(cm)
-
-    ax.set_xlabel("Predicted Label")
-    ax.set_ylabel("True Label")
-    ax.set_title("Confusion Matrix")
-
-    # Tampilkan angka di dalam sel
-    for i in range(cm.shape[0]):
-        for j in range(cm.shape[1]):
-            ax.text(j, i, cm[i, j], ha="center", va="center")
-
-    st.pyplot(fig)
-
+    
 
 # ===== PREDIKSI =====
 elif page == "Prediksi":
@@ -814,3 +807,4 @@ elif page == "Prediksi":
         st.dataframe(
             importance_df.style.format({"Importance": "{:.4f}"})
         )
+
